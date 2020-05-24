@@ -45,7 +45,6 @@ public class FileParser {
                 }
             }
         }
-
         return mat;
     }
 
