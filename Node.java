@@ -22,7 +22,7 @@ public class Node {
         this.parent = parent;
         setCost();
     }
-
+    /*          Set Goal for the puzzle at parse            */
     public static void setGOAL(int n, int m){
         GOAL = new int[n][m];
         int c = 1;
@@ -42,7 +42,7 @@ public class Node {
         }
         return true;
     }
-
+    /*          Deep equals for game board              */
     public boolean equals(Node second){
         for (int i = 0; i < blocks.length; i++) {
             for (int j = 0; j < blocks[0].length; j++) {
@@ -79,7 +79,7 @@ public class Node {
         }
         return q;
     }
-
+    /*      Creates path after goal was found       */
     public String getPath(){
         if(parent.parent==null)
             return name;
@@ -94,6 +94,7 @@ public class Node {
     public int getCost() {
         return cost;
     }
+
     public Node getParent() {
         return parent;
     }
@@ -105,20 +106,20 @@ public class Node {
     public String getName() {
         return name;
     }
+    /*      Set cost for node at initialization          */
     public void setCost(){
-        Node n = this;
-        int c = 0;
-        while(n!=null){
-            if(n.getName() != "") {
-                c = Integer.parseInt(n.getName().substring(0,n.getName().length()-1));
+            if(name != "") {
+                int c = Integer.parseInt(name.substring(0,name.length()-1));
                 if (RED.contains(c))
-                    cost += 30;
+                    cost = parent.getCost() + 30;
                 else
-                    cost += 1;
+                    cost = parent.getCost() + 1;
             }
-            n = n.parent;
+            else{
+                cost = 0;
+            }
         }
-    }
+
     public void setName(String name) {
         this.name = name;
     }

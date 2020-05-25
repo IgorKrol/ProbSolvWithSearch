@@ -5,7 +5,7 @@ import java.util.Vector;
 
 public class FileParser {
     BufferedReader br;
-
+    /*          Init Buffer         */
     public FileParser(String path){
         File file = new File(path);
         try {
@@ -15,7 +15,7 @@ public class FileParser {
         }
 
     }
-
+    /*          Parse file as asked         */
     public int[][] parse() throws IOException {
         String line;
         Vector<Integer> black, red;
@@ -47,7 +47,7 @@ public class FileParser {
         }
         return mat;
     }
-
+    /*          parse colored blocks vector        */
     private Vector<Integer> parseColors(String str){
         if (str.isEmpty()){
             return null;
