@@ -49,8 +49,8 @@ public class FileParser {
     }
     /*          parse colored blocks vector        */
     private Vector<Integer> parseColors(String str){
-        if (str.isEmpty()){
-            return null;
+        if (str == null || str.isEmpty() || str == ""){
+            return new Vector<>();
         }
         else {
             String[] sr = str.substring(1).split(",");

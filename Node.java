@@ -1,8 +1,11 @@
+import org.jetbrains.annotations.NotNull;
+
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Vector;
 
-public class Node {
+public class Node implements Comparable<Node>, Comparator<Node> {
     /*      Static Info     */
     public static int[][] GOAL;
     public static Vector<Integer> BLACK;
@@ -10,6 +13,7 @@ public class Node {
 
     /*       Parameters       */
     int cost = 0;
+    int eval = 0;
     int[][] blocks;
     Node parent;
     String name;    //  NUM-DIRACTION. 4exmple: 7L
@@ -21,6 +25,7 @@ public class Node {
         this.blocks = mat;
         this.parent = parent;
         setCost();
+//        setEval();
     }
     /*          Set Goal for the puzzle at parse            */
     public static void setGOAL(int n, int m){
@@ -43,7 +48,9 @@ public class Node {
         return true;
     }
     /*          Deep equals for game board              */
-    public boolean equals(Node second){
+    @Override
+    public boolean equals(Object o){
+        Node second = (Node)o;
         for (int i = 0; i < blocks.length; i++) {
             for (int j = 0; j < blocks[0].length; j++) {
                 if(blocks[i][j] != second.blocks[i][j])
@@ -51,6 +58,16 @@ public class Node {
             }
         }
         return true;
+    }
+    @Override
+    public int hashCode(){
+        int c = 0;
+        for (int i = 0; i < blocks.length; i++) {
+            for (int j = 0; j < blocks[0].length; j++) {
+                c+=blocks[i][j]*(i+1)*(j+1);
+            }
+        }
+        return c;
     }
     /*      Create new possible nodes       */
     public Queue<Node> operators(){
@@ -108,7 +125,7 @@ public class Node {
     }
     /*      Set cost for node at initialization          */
     public void setCost(){
-            if(name != "") {
+            if(name != null && name != "") {
                 int c = Integer.parseInt(name.substring(0,name.length()-1));
                 if (RED.contains(c))
                     cost = parent.getCost() + 30;
@@ -122,5 +139,33 @@ public class Node {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+//    public void setEval(){
+//        int res = 0;
+//        for (int i = 0; i < blocks.length; i++) {
+//            for (int j = 0; j < blocks[0].length; j++) {
+//                if(blocks[i][j] != 0)
+//                    res+=blocks[i][j]-((i)*blocks[0].length + j + 1);
+//                else
+//            }
+//        }
+//    }
+    @Override
+    public int compareTo(Node o) {
+        if(this.getCost() > o.getCost())
+            return 1;
+        if(this.getCost() < o.getCost())
+            return -1;
+        return 0;
+    }
+
+    @Override
+    public int compare(Node x, Node y) {
+        if(x.getCost() > y.getCost())
+            return 1;
+        if(x.getCost() < y.getCost())
+            return -1;
+        return 0;
     }
 }
