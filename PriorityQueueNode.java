@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class PriorityQueueNode {
 
@@ -35,13 +36,17 @@ public class PriorityQueueNode {
         for (int i = 0; i < pl.size(); i++) {
             Node t = pl.get(i);
             if(t.equals(n)){
-                System.out.println("T:"+t.getCost() + " N:"+n.getCost());
                 if(t.compareTo(n)>0){
                     pl.remove(i);
                     this.add(t);
+                    break;
                 }
             }
         }
+    }
+
+    public String toString(){
+        return Arrays.deepToString(pl.toArray());
     }
 
     public int size() {

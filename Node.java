@@ -25,7 +25,7 @@ public class Node implements Comparable<Node>, Comparator<Node> {
         this.blocks = mat;
         this.parent = parent;
         setCost();
-//        setEval();
+        setEval();
     }
     /*          Set Goal for the puzzle at parse            */
     public static void setGOAL(int n, int m){
@@ -141,31 +141,48 @@ public class Node implements Comparable<Node>, Comparator<Node> {
         this.name = name;
     }
 
-//    public void setEval(){
-//        int res = 0;
-//        for (int i = 0; i < blocks.length; i++) {
-//            for (int j = 0; j < blocks[0].length; j++) {
-//                if(blocks[i][j] != 0)
-//                    res+=blocks[i][j]-((i)*blocks[0].length + j + 1);
-//                else
-//            }
-//        }
-//    }
+    public int getEval(){
+        return eval;
+    }
+
+    public void setEval(){
+        int res = 0;
+        for (int i = 0; i < blocks.length; i++) {
+            for (int j = 0; j < blocks[0].length; j++) {
+                for (int i1 = 0; i1 < blocks.length; i1++) {
+                    for (int j2 = 0; j2 < blocks[0].length; j2++) {
+                        if(blocks[i][j]==GOAL[i1][j2] && blocks[i][j] != 0){
+                            int temp = Math.abs(i-i1)+Math.abs(j-j2);
+                            if(RED.contains(blocks[i][j])) temp = temp * 30;
+                            res += temp;
+                        }
+                    }
+                }
+            }
+        }
+        eval = res + cost;
+    }
+    /*      Comparators     */
     @Override
     public int compareTo(Node o) {
-        if(this.getCost() > o.getCost())
+        if(this.getEval() > o.getEval())
             return 1;
-        if(this.getCost() < o.getCost())
+        if(this.getEval() < o.getEval())
             return -1;
         return 0;
     }
 
     @Override
     public int compare(Node x, Node y) {
-        if(x.getCost() > y.getCost())
+        if(x.getEval() > y.getEval())
             return 1;
-        if(x.getCost() < y.getCost())
+        if(x.getEval() < y.getEval())
             return -1;
         return 0;
+    }
+    @Override
+    public String toString(){
+//        return ""+Tools.matString(blocks);
+        return ""+getEval();
     }
 }
