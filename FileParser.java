@@ -20,9 +20,20 @@ public class FileParser {
         String line;
         Vector<Integer> black, red;
         int[][] mat;
-        for(int i = 0; i<3; i++)
-            br.readLine();
-
+        
+        /* 		  First Settings		*/
+        Algorithms.alg = br.readLine();
+        String wtime = br.readLine();
+        if(wtime.equalsIgnoreCase("with time"))
+        	Algorithms.with_time = true;
+        else
+        	Algorithms.with_time = false;
+        String openList = br.readLine();
+        if(openList.equalsIgnoreCase("no open"))
+        	Algorithms.with_open_list = false;
+        else
+        	Algorithms.with_open_list = true;
+        
         /*        Mat,GOAL init      */
         String[] nm = br.readLine().split("x");   //mat [N][M]
         int rows = Integer.parseInt(nm[0]), colm = Integer.parseInt(nm[1]);

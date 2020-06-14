@@ -1,5 +1,3 @@
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -17,6 +15,7 @@ public class Node implements Comparable<Node>, Comparator<Node> {
     int[][] blocks;
     Node parent;
     String name;    //  NUM-DIRACTION. 4exmple: 7L
+    boolean isOut = false;		//for IDA*, marks if node was already out or not.
 
 
 
@@ -26,6 +25,7 @@ public class Node implements Comparable<Node>, Comparator<Node> {
         this.parent = parent;
         setCost();
         setEval();
+        isOut = false;
     }
     /*          Set Goal for the puzzle at parse            */
     public static void setGOAL(int n, int m){
@@ -114,6 +114,14 @@ public class Node implements Comparable<Node>, Comparator<Node> {
 
     public Node getParent() {
         return parent;
+    }
+    
+    public boolean isOut() {
+    	return isOut;
+    }
+    
+    public void markOut() {
+    	isOut = true;
     }
 
     public void setParent(Node parent) {
