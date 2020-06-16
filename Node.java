@@ -1,5 +1,3 @@
-import org.jetbrains.annotations.NotNull;
-
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -13,10 +11,11 @@ public class Node implements Comparable<Node>, Comparator<Node> {
 
     /*       Parameters       */
     int cost = 0;
-    int eval = 0;
+    int h = 0;
     int[][] blocks;
     Node parent;
     String name;    //  NUM-DIRACTION. 4exmple: 7L
+    boolean isOut = false;		//for IDA*, marks if node was already out or not.
 
 
 
@@ -25,7 +24,8 @@ public class Node implements Comparable<Node>, Comparator<Node> {
         this.blocks = mat;
         this.parent = parent;
         setCost();
-        setEval();
+        setH();
+        isOut = false;
     }
     /*          Set Goal for the puzzle at parse            */
     public static void setGOAL(int n, int m){
@@ -111,11 +111,23 @@ public class Node implements Comparable<Node>, Comparator<Node> {
     public int getCost() {
         return cost;
     }
-
+    
     public Node getParent() {
         return parent;
     }
-
+    /* returns if node is marked for IDA* */
+    public boolean isOut() {
+    	return isOut;
+    }
+    /* unMarks the Node for IDA* */
+    public void unMark() {
+    	isOut = false;
+    }
+    /* Marks the Node for IDA* */
+    public void markOut() {
+    	isOut = true;
+    }
+    
     public void setParent(Node parent) {
         this.parent = parent;
     }
@@ -140,12 +152,12 @@ public class Node implements Comparable<Node>, Comparator<Node> {
     public void setName(String name) {
         this.name = name;
     }
-
-    public int getEval(){
-        return eval;
+    /*	return heuristic function	*/
+    public int h(){
+        return h;
     }
-
-    public void setEval(){
+    /*	set heuristic function value for Node	*/
+    public void setH(){
         int res = 0;
         for (int i = 0; i < blocks.length; i++) {
             for (int j = 0; j < blocks[0].length; j++) {
@@ -160,29 +172,33 @@ public class Node implements Comparable<Node>, Comparator<Node> {
                 }
             }
         }
-        eval = res + cost;
+        h = res;
+    }
+    /*	f = g + h -> g=cost h=heuristic	*/
+    public int f() {
+    	return h() + getCost();
     }
     /*      Comparators     */
     @Override
     public int compareTo(Node o) {
-        if(this.getEval() > o.getEval())
+        if(this.h() > o.h())
             return 1;
-        if(this.getEval() < o.getEval())
+        if(this.h() < o.h())
             return -1;
         return 0;
     }
 
     @Override
     public int compare(Node x, Node y) {
-        if(x.getEval() > y.getEval())
+        if(x.h() > y.h())
             return 1;
-        if(x.getEval() < y.getEval())
+        if(x.h() < y.h())
             return -1;
         return 0;
     }
     @Override
     public String toString(){
 //        return ""+Tools.matString(blocks);
-        return ""+getEval();
+        return ""+h();
     }
 }
