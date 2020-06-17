@@ -5,8 +5,8 @@ public class Algorithms {
 	public static int NODECOUNT = 1;
 	public static int CHECK = 0;
 	public static String alg;
-	public static Boolean with_time;
-	public static Boolean with_open_list;
+	public static Boolean with_time = false;
+	public static Boolean with_open_list = false;
 
 	public static String run(Node s) {
 		switch (alg) {
@@ -27,26 +27,31 @@ public class Algorithms {
 	}
 	/**************** DFBnB ****************/
 	public static String DFBnB(Node start) {
-		Stack<Node> L = new Stack<Node>();
+		start.unMark();
+		NODECOUNT=1;
+		Stack<Node> openList = new Stack<Node>();
 		Hashtable<Node,Node> H = new Hashtable<Node,Node>();
-		L.add(start);
+		openList.add(start);
 		H.put(start,start);
-		String result = "no path\nNum:" + NODECOUNT;
+		String result = "no path\nNum:";
+		/*		UpperBound		*/
 		int factorail = 1;
 		for(int i = 1; i <= Node.GOAL.length*Node.GOAL[0].length; i++)
 			factorail *= i;
 		int t = Math.min(factorail, Integer.MAX_VALUE);
-		while(!L.isEmpty()) {
-			Node n = L.pop();
+		while(!openList.isEmpty()) {
+			if(with_open_list)
+				System.out.println(Arrays.deepToString(openList.toArray()));
+			Node n = openList.pop();
 			if(n.isOut)
 				H.remove(n);
 			else {
 				n.markOut();
-				L.add(n);
+				openList.add(n);
 				ArrayList<Node> N = new ArrayList<Node>();
 				for(Node temp : n.operators()) 
 					N.add(temp);
-				N.sort(Node::compareTo);
+				N.sort((a,b) -> a.f() - b.f());
 				for(int i = 0; i < N.size(); i++) {
 					Node g = N.get(i);
 					NODECOUNT++;
@@ -64,7 +69,7 @@ public class Algorithms {
 									N.remove(g);
 								}
 								else {
-									L.remove(g);
+									openList.remove(g);
 									H.remove(g);
 								}
 							}
@@ -79,23 +84,30 @@ public class Algorithms {
 						}
 				}
 				for(int i = 0; i < N.size(); i++) {
-					L.add(N.get(N.size()-1-i));
+					openList.add(N.get(N.size()-1-i));
 					H.put(N.get(N.size()-1-i),N.get(N.size()-1-i));
 				}
 			}
 		}
+		if(result.contains("no path"))
+			return "no path\nNum: " + NODECOUNT;
 		return result;
 	}
 	/**************** IDA* ****************/
 	public static String IDA(Node start){
+		start.unMark();
+		NODECOUNT=1;
 		Stack<Node> openList = new Stack<Node>();
 		Hashtable<Node, Node> H = new Hashtable<Node, Node>();
 		int t = start.h();
 		while(t!=Integer.MAX_VALUE) {
 			int minF = Integer.MAX_VALUE;
+//			start.unMark();
 			openList.add(start);
 			H.put(start, start);
 			while(!openList.isEmpty()) {
+				if(with_open_list)
+					System.out.println("OpenList::"+Arrays.deepToString(openList.toArray()));
 				Node n = openList.pop();
 				if(n.isOut()) {
 					H.remove(n);
@@ -126,33 +138,38 @@ public class Algorithms {
 						}
 						openList.add(g);
 						H.put(g, g);
-					}
-					t = minF;
+						}
 				}
 			}
+			t = minF;
 		}
 		return "no path\nNum: " + NODECOUNT;
 	}
 	/**************** A* ****************/
 	public static String UCS(Node start){
-		PriorityQueueNode queList = new PriorityQueueNode();
-		queList.add(start);
-		HashSet<Node> closedList = new HashSet<>();
-		while(!queList.isEmpty()){
-			Node n = queList.poll();
-			if(n.isGoal())
+		NODECOUNT=1;
+		PriorityQueueNode openList = new PriorityQueueNode();
+		Hashtable<Node,Node> openListHash = new Hashtable<>();
+		openList.add(start);
+		openListHash.put(start,start);
+		Hashtable<Node, Node> closeList = new Hashtable<>();
+		while(!openList.isEmpty()){
+			if(with_open_list)
+				System.out.println(Arrays.deepToString(openList.toArray()));
+			Node n = openList.poll();
+			openListHash.remove(n);
+			if (n.isGoal())
 				return n.getPath() + "\nNum: " + NODECOUNT + "\nCost: " + n.getCost();
-			closedList.add(n);
-			Queue<Node> op = n.operators();
-			while (!op.isEmpty()){
-				Node g = op.poll();
+			closeList.put(n,n);
+			for(Node x : n.operators()){
 				NODECOUNT++;
-				if(!closedList.contains(g) && !queList.contains(g)){
-					queList.add(g);
+				if(!openListHash.contains(x) && !closeList.contains(x)){
+					openList.add(x);
+					openListHash.put(x,x);
 				}
 				else{
-					if(queList.contains(g)){
-						queList.swapForLowerValue(g);
+					if(openListHash.contains(x) && openListHash.get(x).f() > x.f()){
+						openList.swapForLowerValue(x);
 					}
 				}
 			}
@@ -162,14 +179,18 @@ public class Algorithms {
 
 	/**************** DFID ****************/
 	public static String DFID(Node start){
+		NODECOUNT=1;
 		String result;
 		for (int depth = 0; depth < Integer.MAX_VALUE; depth++) {
 			Hashtable<Node,Node> ht = new Hashtable<>();
 			result = Limited_DFS(start, depth, ht);
 			if(!result.equals("Cutoff"))
-				return result;
+				if(result.equals("fail"))
+					return "no path\nNum: " + NODECOUNT;
+				else
+					return result;
 		}
-		return "no path\nNum:" + NODECOUNT;
+		return "no path\nNum: " + NODECOUNT;
 	}
 
 	private static String Limited_DFS(Node n, int limit, Hashtable<Node,Node> h){
@@ -205,21 +226,24 @@ public class Algorithms {
 
 	/**************** BFS ****************/
 	public static String BFS(Node start){
-		Queue<Node> L = new LinkedList<Node>();
+		NODECOUNT=1;
+		Queue<Node> openList = new LinkedList<Node>();
 		Hashtable<Node, Node> H = new Hashtable<Node, Node>();
-		L.add(start);
+		openList.add(start);
 		H.put(start, start);
-		Hashtable<Node, Node> C = new Hashtable<Node, Node>();
-		while(!L.isEmpty()){
-			Node n = L.poll();
+		Hashtable<Node, Node> closeList = new Hashtable<Node, Node>();
+		while(!openList.isEmpty()){
+			if(with_open_list)
+				System.out.println(Arrays.deepToString(openList.toArray()));
+			Node n = openList.poll();
 			H.remove(n);
-			C.put(n,n);
+			closeList.put(n,n);
 			for(Node g : n.operators()) {
 				NODECOUNT++;
-				if(!C.contains(g) && !H.contains(g)) {
+				if(!closeList.contains(g) && !H.contains(g)) {
 					if(g.isGoal())
 						return g.getPath() + "\nNum: " + NODECOUNT + "\nCost: " + g.getCost();
-					L.add(g);
+					openList.add(g);
 					H.put(g,g);
 				}
 			}

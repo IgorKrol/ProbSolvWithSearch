@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 
+/*      Custom Priority Queue class with ArrayList<Node> for A*       */
 public class PriorityQueueNode {
 
     ArrayList<Node> pl;
@@ -12,7 +13,7 @@ public class PriorityQueueNode {
 
     public void add(Node n) {
         pl.add(n);
-        pl.sort(Node::compareTo);
+        pl.sort((a,b)->(a.f() - b.f()));
     }
 
     public boolean isEmpty() {
@@ -32,15 +33,15 @@ public class PriorityQueueNode {
         return false;
     }
 
+    /*      swap nodes       */
     public void swapForLowerValue(Node n){
         for (int i = 0; i < pl.size(); i++) {
             Node t = pl.get(i);
             if(t.equals(n)){
-                if(t.compareTo(n)>0){
+                System.out.println("HERE");
                     pl.remove(i);
-                    this.add(t);
+                    this.add(n);
                     break;
-                }
             }
         }
     }
@@ -51,5 +52,9 @@ public class PriorityQueueNode {
 
     public int size() {
         return pl.size();
+    }
+
+    public Object[] toArray() {
+        return pl.toArray();
     }
 }

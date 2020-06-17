@@ -5,14 +5,14 @@ import java.util.Vector;
 
 public class Node implements Comparable<Node>, Comparator<Node> {
     /*      Static Info     */
-    public static int[][] GOAL;
-    public static Vector<Integer> BLACK;
-    public static Vector<Integer> RED;
+    public static int[][] GOAL;     //goal board
+    public static Vector<Integer> BLACK;        //black blocks
+    public static Vector<Integer> RED;      //red blocks
 
     /*       Parameters       */
-    int cost = 0;
-    int h = 0;
-    int[][] blocks;
+    int cost = 0;   // cost to get to this node (start->....->current)
+    int h = 0;  // heuristic function value
+    int[][] blocks; // tile-puzzle board
     Node parent;
     String name;    //  NUM-DIRACTION. 4exmple: 7L
     boolean isOut = false;		//for IDA*, marks if node was already out or not.
@@ -69,7 +69,7 @@ public class Node implements Comparable<Node>, Comparator<Node> {
         }
         return c;
     }
-    /*      Create new possible nodes       */
+    /*      Create new possible (Moves) nodes       */
     public Queue<Node> operators(){
         Queue<Node> q = new LinkedList<>();
         for (int i = 0; i < blocks.length; i++) {
@@ -98,6 +98,8 @@ public class Node implements Comparable<Node>, Comparator<Node> {
     }
     /*      Creates path after goal was found       */
     public String getPath(){
+        if(parent == null)
+            return name;
         if(parent.parent==null)
             return name;
         else
@@ -161,6 +163,7 @@ public class Node implements Comparable<Node>, Comparator<Node> {
         int res = 0;
         for (int i = 0; i < blocks.length; i++) {
             for (int j = 0; j < blocks[0].length; j++) {
+                /*   first function = Manheten Distance  */
                 for (int i1 = 0; i1 < blocks.length; i1++) {
                     for (int j2 = 0; j2 < blocks[0].length; j2++) {
                         if(blocks[i][j]==GOAL[i1][j2] && blocks[i][j] != 0){
@@ -170,6 +173,10 @@ public class Node implements Comparable<Node>, Comparator<Node> {
                         }
                     }
                 }
+                /*      second function = count how many 'blocks' arent in place (for goal)        */
+//                if(blocks[i][j] != GOAL[i][j])
+//                    if(RED.contains(blocks[i][j])) res+=30;
+//                    else res+=1;
             }
         }
         h = res;
@@ -181,24 +188,24 @@ public class Node implements Comparable<Node>, Comparator<Node> {
     /*      Comparators     */
     @Override
     public int compareTo(Node o) {
-        if(this.h() > o.h())
+        if(this.f() > o.f())
             return 1;
-        if(this.h() < o.h())
+        if(this.f() < o.f())
             return -1;
         return 0;
     }
 
     @Override
     public int compare(Node x, Node y) {
-        if(x.h() > y.h())
+        if(x.f() > y.f())
             return 1;
-        if(x.h() < y.h())
+        if(x.f() < y.f())
             return -1;
         return 0;
     }
     @Override
     public String toString(){
-//        return ""+Tools.matString(blocks);
-        return ""+h();
+        return "\npath: "+getPath()+"\n cost: "+ cost + " f(): "+f()+"\n"+Tools.matString(blocks);
+//        return ""+f();
     }
 }
