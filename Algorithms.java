@@ -102,7 +102,7 @@ public class Algorithms {
 		int t = start.h();
 		while(t!=Integer.MAX_VALUE) {
 			int minF = Integer.MAX_VALUE;
-//			start.unMark();
+			start.unMark();
 			openList.add(start);
 			H.put(start, start);
 			while(!openList.isEmpty()) {
